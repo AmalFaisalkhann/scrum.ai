@@ -7,7 +7,7 @@ import Signup from './Auth/Signup';
 import ForgotPassword from './Auth/ForgotPassword';
 import Userroles from './Userroles/Userroles';
 import Productowner from './Dashboard/Productowner';
-
+import SuperUser from './Dashboard/SuperUser';
 
 function App() {
   return (
@@ -18,6 +18,8 @@ function App() {
       <Route path="/ForgotPassward" element={<ForgotPassword />} />
       <Route path="*" element={<Navigate to="/" />} />
       <Route path="/Productowner" element={<Productowner />} />
+            <Route path="SuperUser" element={<SuperUser />} />
+
 
     </Routes>
   );
