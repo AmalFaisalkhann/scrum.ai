@@ -1,4 +1,3 @@
-// src/Dashboard/Productowner.js
 
 import React from 'react';
 import './Productowner.css';
@@ -48,12 +47,6 @@ function ProductOwner() {
 
       {/* Footer */}
       <footer className="bottom-nav">
-        <ul>
-          <li>🏠 Home</li>
-          <li>📋 Standups</li>
-          <li>💬 Feedback</li>
-          <li>🔔 Notifications</li>
-        </ul>
       </footer>
     </>
   );
