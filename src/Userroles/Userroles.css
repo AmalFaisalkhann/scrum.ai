@@ -1,0 +1,77 @@
+/* src/auth/roles.css */
+
+.role-selection-container {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f5f8ff; /* matches light blue background from reference */
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.role-heading {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.role-subheading {
+  font-size: 18px;
+  color: #6b7280;
+  margin-bottom: 40px;
+}
+
+.role-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.role-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 260px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.role-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.role-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.role-card p {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.continue-button {
+  padding: 10px 24px;
+  font-size: 16px;
+  background-color: #d1d5db;
+  color: #111827;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.continue-button:hover {
+  background-color: #9ca3af;
+}
