@@ -44,7 +44,7 @@ const Workspace = () => {
           <div className="workspace-setup">
             <input
               type="email"
-              placeholder="Enter your product owner email"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
