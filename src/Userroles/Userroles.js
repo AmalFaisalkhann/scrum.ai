@@ -19,19 +19,19 @@ function Roles() {
 
       <div className="role-cards">
         <div className="role-card developer" onClick={() => handleRoleSelect('Developer')}>
-          <div className="role-icon">💻</div>
+         
           <h2>Developer</h2>
           <p>Build and implement features, write code, and collaborate with the team</p>
         </div>
 
         <div className="role-card project-manager" onClick={() => handleRoleSelect('Project Manager')}>
-          <div className="role-icon">📂</div>
+          
           <h2>Project Manager</h2>
           <p>Coordinate projects, manage timelines, and ensure delivery</p>
         </div>
 
         <div className="role-card product-owner" onClick={() => handleRoleSelect('Product Owner')}>
-          <div className="role-icon">🧭</div>
+         
           <h2>Product Owner</h2>
           <p>Define product vision, prioritize backlog, and maximize value</p>
         </div>
