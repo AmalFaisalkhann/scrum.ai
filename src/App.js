@@ -1,29 +1,34 @@
-
+// src/App.js
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './Dashboard/LandingPage';
+import Workspace from './Dashboard/Workspace';
+import EnterWorkspace from './Dashboard/EnterWorkspace';
+import Manager from './Dashboard/Manager';
 import Login from './Auth/Login';
 import Signup from './Auth/Signup';
 import ForgotPassword from './Auth/ForgotPassword';
-import Userroles from './Userroles/Userroles';
 import Productowner from './Dashboard/Productowner';
-import Workspace from './Dashboard/Workspace';
-import EnterWorkspace from './Dashboard/EnterWorkspace';
+import Developer from './Dashboard/Developer';
+import SuperUserScreen from './Dashboard/SuperUserScreen';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Userroles />} />
-      <Route path="/Login" element={<Login />} />
-      <Route path="/Signup" element={<Signup />} />
-      <Route path="/ForgotPassward" element={<ForgotPassword />} />
-      <Route path="*" element={<Navigate to="/" />} />
-      <Route path="/Productowner" element={<Productowner />} />
-            <Route path="Workspace" element={<Workspace />} />
-<Route path="/EnterWorkspace" element={<EnterWorkspace />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/workspace" element={<Workspace />} />
+        <Route path="/enter-workspace" element={<EnterWorkspace />} />
+        <Route path="/manager" element={<Manager />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/Productowner" element={<Productowner />} /> {/* ✅ Added route */}
+                <Route path="/Developer" element={<Developer />} /> {/* ✅ Added route */}
+                <Route path="/SuperUserScreen" element={<SuperUserScreen/>} /> {/* ✅ Added route */}
 
-
-
-    </Routes>
+      </Routes>
+    </Router>
   );
 }
 

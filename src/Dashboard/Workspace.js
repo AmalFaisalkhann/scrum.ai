@@ -23,12 +23,10 @@ const Workspace = () => {
     setWorkspaceName('');
   };
 
-  const handleEnterWorkspace = (workspace) => {
-    setActiveWorkspace(workspace);
-    // Navigate to the Product Owner dashboard and pass workspace name
-    navigate('/Productowner', { state: { workspace, email: currentUser } });
-  };
-
+ const handleEnterWorkspace = (workspace) => {
+  setActiveWorkspace(workspace);
+  navigate('/Manager', { state: { workspace, email: currentUser } }); // ✅ make sure this is "Manager"
+};
   const handleSwitchWorkspace = () => {
     setActiveWorkspace('');
   };

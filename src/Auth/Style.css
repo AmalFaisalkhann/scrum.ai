@@ -7,7 +7,7 @@
 /* Left Panel */
 .left-panel {
   width: 60%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:rgb(4, 93, 165);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,7 +130,7 @@
 
 .auth-input:focus,
 .auth-input:hover {
-  border-color: #667eea;
+  border-color:rgb(4, 93, 165);
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
@@ -144,21 +144,21 @@
 }
 
 .forgot-link {
-  color: #667eea !important;
+  color:rgb(4, 93, 165);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
 }
 
 .forgot-link:hover {
-  color: #5a67d8 !important;
+  color:rgb(4, 93, 165)!important;
   text-decoration: underline;
 }
 
 /* Button */
 .auth-button {
   height: 50px !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background:rgb(4, 93, 165);
   border: none !important;
   border-radius: 8px !important;
   font-size: 16px !important;
@@ -168,11 +168,11 @@
 
 .auth-button:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 8px 16px rgba(4, 93, 165, 0.3) !important;
 }
 
 .auth-button:focus {
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(4, 93, 165, 0.3) !important;
 }
 
 /* Footer */
@@ -187,14 +187,14 @@
 }
 
 .signup-link {
-  color: #667eea !important;
+  color: rgb(4, 93, 165)!important;
   font-weight: 600 !important;
   text-decoration: none !important;
   margin-left: 4px;
 }
 
 .signup-link:hover {
-  color: #5a67d8 !important;
+  color: rgb(4, 93, 165)!important;
   text-decoration: underline !important;
 }
 
@@ -254,7 +254,7 @@
 
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
-  border-color: #667eea !important;
+  border-color:rgb(4, 93, 165) !important;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
 }
 
