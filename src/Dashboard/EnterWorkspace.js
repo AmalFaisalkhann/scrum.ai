@@ -4,55 +4,38 @@ import './EnterWorkspace.css';
 
 const EnterWorkspace = () => {
   const [email, setEmail] = useState('');
-  const [workspaces, setWorkspaces] = useState({
-    'owner@example.com': ['MarketingSprint', 'DevTeam'],
-    'manager@company.com': ['FinanceTeam'],
-  });
-
-  const [userWorkspaces, setUserWorkspaces] = useState([]);
+  const [workspaceName, setWorkspaceName] = useState('');
   const navigate = useNavigate();
 
-  const handleCheckWorkspaces = () => {
-    if (!email) return;
-    const found = workspaces[email] || [];
-    setUserWorkspaces(found);
-  };
-
-  const handleEnterWorkspace = (workspaceName) => {
-    navigate('/Productowner', {
-      state: {
-        email,
-        workspace: workspaceName,
-      },
-    });
+  const handleProceedToLogin = () => {
+    if (email && workspaceName) {
+      navigate('/login', {
+        state: { email, workspace: workspaceName }
+      });
+    }
   };
 
   return (
-    <div className="enter-workspace-container">
+    <div className="workspace-container">
       <h1 className="page-title">Enter Workspace</h1>
 
-      <div className="form-section">
+      <div className="workspace-setup">
         <input
           type="email"
-          placeholder="Enter your email"
+          placeholder="Enter workspace email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button onClick={handleCheckWorkspaces}>Proceed To Login</button>
-      </div>
 
-      {userWorkspaces.length > 0 && (
-        <ul className="workspace-list">
-          {userWorkspaces.map((ws, index) => (
-            <li key={index}>
-              {ws}
-              <button onClick={() => handleEnterWorkspace(ws)}>
-                Enter
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+        <input
+          type="text"
+          placeholder="Enter workspace name"
+          value={workspaceName}
+          onChange={(e) => setWorkspaceName(e.target.value)}
+        />
+
+        <button onClick={handleProceedToLogin}>Proceed To Login</button>
+      </div>
     </div>
   );
 };

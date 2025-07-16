@@ -12,7 +12,7 @@ body {
 
 /* Header */
 .top-nav {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background:rgb(4, 93, 165);
   padding: 16px 32px;
   display: flex;
   justify-content: space-between;
@@ -87,14 +87,14 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-color: rgb(4, 93, 165);
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
 
 /* Buttons */
 button {
   height: 50px;
-background: linear-gradient(135deg, #4f46e5, #7c3aed);
+background: rgb(4, 93, 165);
   color: white;
   border: none;
   border-radius: 8px;
@@ -107,7 +107,7 @@ background: linear-gradient(135deg, #4f46e5, #7c3aed);
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 16px rgb(4, 93, 165);
 }
 
 /* Footer */

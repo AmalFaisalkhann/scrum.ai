@@ -35,7 +35,7 @@
 
 .workspace-setup button {
   padding: 12px 20px;
-background: linear-gradient(135deg, #4f46e5, #7c3aed);
+background: rgb(4, 93, 165);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -46,9 +46,9 @@ background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
 .workspace-setup button:hover {
-background: linear-gradient(135deg, #4f46e5, #7c3aed);
-}
+background: rgb(4, 93, 165);
 
+}
 .workspace-list {
   list-style: none;
   padding: 0;
@@ -72,7 +72,7 @@ background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
 .workspace-actions button {
-background: linear-gradient(135deg, #4f46e5, #7c3aed);
+background: rgb(4, 93, 165);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -85,7 +85,7 @@ background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
 .workspace-actions button:hover {
-background: linear-gradient(135deg, #4f46e5, #7c3aed);
+background:rgb(4, 93, 165);
 }
 
 .section-subtitle {

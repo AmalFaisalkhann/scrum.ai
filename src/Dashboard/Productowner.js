@@ -2,7 +2,7 @@
 import React from 'react';
 import './Productowner.css';
 
-function ProductOwner() {
+function Productowner() {
   return (
     <>
       {/* Header */}
@@ -52,4 +52,4 @@ function ProductOwner() {
   );
 }
 
-export default ProductOwner;
+export default Productowner;
