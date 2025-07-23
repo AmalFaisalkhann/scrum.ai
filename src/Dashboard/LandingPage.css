@@ -1,0 +1,356 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fafb;
+}
+
+.landing-container {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color:rgb(4, 93, 165);
+}
+
+.nav-links a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color:rgb(4, 93, 165);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color:rgb(4, 93, 165);
+}
+
+.primary-button {
+  background-color:rgb(4, 93, 165);
+  color: white;
+  padding: 0.5rem 1.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap; 
+}
+
+.primary-button:hover {
+  background-color: #1e40af;
+}
+
+.hero-section {
+  background: linear-gradient(to bottom right, #eff6ff, #f3e8ff);
+  padding: 4rem 1rem;
+}
+
+.ai-badge {
+  display: flex;                 /* Changed from inline-flex */
+  align-items: center;
+  justify-content: center;
+  background-color: #dbeafe;
+  color:rgb(4, 93, 165);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  margin: 2rem auto;            /* Center horizontally */
+  text-align: center;
+  width: max-content;           /* Ensure it doesn't stretch */
+}
+
+.icon {
+  margin-left: 0.5rem;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  background: rgb(4, 93, 165);
+  background-clip: text;
+  -webkit-background-clip: text; /* Required for Chrome/Safari */
+  color: transparent;
+  -webkit-text-fill-color: transparent; /* Required for Chrome/Safari */
+  text-align: center;
+}
+
+
+.hero-subtitle {
+  font-size: 2.5rem;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  color: #6b7280;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.gradient-button {
+  display: inline-flex;         /* Use inline-flex to size according to content */
+  align-items: center;         /* ✅ Vertically center content */
+  justify-content: center;     /* Horizontally center */
+  background: rgb(4, 93, 165);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  gap: 0.5rem;                 /* ✅ Spacing between text and icon */
+}
+
+.gradient-button:hover {
+  background: rgb(4, 93, 165);
+}
+
+.secondary-button {
+  background: white;
+  color: #374151;
+  padding: 1rem 2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background-color: #f3f4f6;
+}
+
+/* Features */
+.features-section {
+  padding: 4rem 1rem;
+  background-color: white;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.feature-icon-container {
+  background: #eff6ff;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.feature-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.feature-icon.blue { color: #2563eb; }
+.feature-icon.purple { color: #7c3aed; }
+.feature-icon.green { color: #10b981; }
+.feature-icon.yellow { color: #facc15; }
+.feature-icon.red { color: #ef4444; }
+.feature-icon.cyan { color: #06b6d4; }
+.feature-icon.orange { color: #f97316; }
+
+/* Testimonials */
+.testimonials-section {
+  background: #f9fafb;
+  padding: 4rem 1rem;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.testimonial-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: left;
+}
+
+.stars {
+  color: #facc15;
+  font-size: 1.25rem;
+}
+
+.testimonial-text {
+  margin: 1rem 0;
+  color: #4b5563;
+}
+
+.testimonial-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.testimonial-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.testimonial-name {
+  font-weight: 600;
+}
+
+.testimonial-role {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* CTA */
+.cta-section {
+  background: rgb(4, 93, 165);
+  color: white;
+  padding: 4rem 1rem;
+}
+
+.cta-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-description {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.white-button {
+  background: white;
+  color:rgb(4, 93, 165);
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.white-button:hover {
+  background-color: #f3f4f6;
+}
+
+.outline-button {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.outline-button:hover {
+  background: white;
+  color:rgb(4, 93, 165);
+}
+
+/* Footer */
+.footer {
+  background: #111827;
+  color: #9ca3af;
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  color: #60a5fa;
+  font-weight: bold;
+}
+
+.footer-description {
+  margin: 1rem 0;
+}
+
+.footer-note {
+  font-size: 0.875rem;
+}
+
+.gradient-text {
+  background: rgb(4, 93, 165);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-button {
+  background: rgb(4, 93, 165);
+  color: white;
+}
+
+.gradient-button:hover {
+  background: rgb(4, 93, 165);
+}
