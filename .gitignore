@@ -10,7 +10,7 @@
 
 #firebase key
 src/firebaseActions.js
-
+src/firebase.js
 # production
 /build
 
