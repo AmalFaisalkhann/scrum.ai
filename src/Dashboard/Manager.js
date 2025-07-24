@@ -18,7 +18,7 @@ const Manager = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [formData, setFormData] = useState({ name: '', id: '', timeline: '' });
-  const [teamData, setTeamData] = useState({ user: '', task: '', count: '' });
+  const [teamData, setTeamData] = useState({ user: '', task: '', count: '', role: 'Developer' });
 
   // Load projects from Firestore
   useEffect(() => {
@@ -26,7 +26,7 @@ const Manager = () => {
       if (!auth.currentUser) return;
       const q = query(collection(db, 'projects'), where('created_by', '==', auth.currentUser.uid));
       const querySnapshot = await getDocs(q);
-      const projectList = querySnapshot.docs.map(docSnap => ({ ...docSnap.data(), docId: docSnap.id }));
+      const projectList = querySnapshot.docs.map(docSnap => ({ ...docSnap.data(), docId: docSnap.id, project_id: docSnap.id }));
       setProjects(projectList);
     };
     fetchProjects();
@@ -36,14 +36,16 @@ const Manager = () => {
   const handleProjectCreate = async () => {
     try {
       if (formData.name && formData.id && formData.timeline) {
-        await addDoc(collection(db, 'projects'), {
+        const docRef = await addDoc(collection(db, 'projects'), {
           name: formData.name,
-          project_id: formData.id,
+          description: formData.name, // Use name as description for now
           timeline: formData.timeline,
           created_by: auth.currentUser.uid,
           team: [],
           created_at: new Date(),
         });
+        // Set project_id to Firestore doc id
+        await updateDoc(docRef, { project_id: docRef.id });
         setFormData({ name: '', id: '', timeline: '' });
         alert('Project added!');
         window.location.reload(); // reload to fetch new project
@@ -59,9 +61,9 @@ const Manager = () => {
     try {
       const projRef = doc(db, 'projects', selectedProject.docId);
       await updateDoc(projRef, {
-        team: arrayUnion({ ...teamData })
+        team: arrayUnion({ ...teamData, role: teamData.role || 'Developer' })
       });
-      setTeamData({ user: '', task: '', count: '' });
+      setTeamData({ user: '', task: '', count: '', role: 'Developer' });
       alert('Team member added!');
       window.location.reload();
     } catch (error) {
@@ -72,12 +74,12 @@ const Manager = () => {
   // Delete project from Firestore
   const handleProjectDelete = async (id) => {
     try {
-      const proj = projects.find(p => p.project_id === id);
+      const proj = projects.find(p => p.docId === id);
       if (proj?.docId) {
         await deleteDoc(doc(db, 'projects', proj.docId));
         alert('Project deleted!');
-        setProjects(projects.filter((p) => p.project_id !== id));
-        if (selectedProject?.project_id === id) setSelectedProject(null);
+        setProjects(projects.filter((p) => p.docId !== id));
+        if (selectedProject?.docId === id) setSelectedProject(null);
       }
     } catch (error) {
       alert(`Error deleting project: ${error.message}`);
@@ -91,7 +93,7 @@ const Manager = () => {
       const projRef = doc(db, 'projects', selectedProject.docId);
       await updateDoc(projRef, {
         name: selectedProject.name,
-        project_id: selectedProject.project_id,
+        description: selectedProject.name, // Keep description in sync
         timeline: selectedProject.timeline,
       });
       alert('Project updated!');
@@ -147,7 +149,7 @@ const Manager = () => {
               <div onClick={() => setSelectedProject(proj)}>
                 <strong>{proj.name}</strong> | ID: {proj.project_id} | Timeline: {proj.timeline}
               </div>
-              <button onClick={() => handleProjectDelete(proj.project_id)} style={{ marginLeft: '10px' }}>Delete</button>
+              <button onClick={() => handleProjectDelete(proj.docId)} style={{ marginLeft: '10px' }}>Delete</button>
             </div>
           ))
         )}
@@ -172,6 +174,13 @@ const Manager = () => {
             </select>
             <input placeholder="Task Name" value={teamData.task} onChange={(e) => setTeamData({ ...teamData, task: e.target.value })} />
             <input placeholder="Task Count" value={teamData.count} onChange={(e) => setTeamData({ ...teamData, count: e.target.value })} />
+            <select value={teamData.role} onChange={(e) => setTeamData({ ...teamData, role: e.target.value })}>
+              <option value="Developer">Developer</option>
+              <option value="Product Owner">Product Owner</option>
+              <option value="Project Manager">Project Manager</option>
+              <option value="Designer">Designer</option>
+              <option value="QA">QA</option>
+            </select>
             <button onClick={handleAddToTeam}>Add to Team</button>
           </div>
 
@@ -181,7 +190,7 @@ const Manager = () => {
             ) : (
               selectedProject.team.map((member, i) => (
                 <div key={i}>
-                  {member.user} - {member.task} ({member.count})
+                  {member.user} - {member.task} ({member.count}) [{member.role || 'Developer'}]
                   <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
                 </div>
               ))
