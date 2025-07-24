@@ -1,6 +1,6 @@
 // login.js
 import React, { useState } from "react";
-import { Form, Input, Button, Typography, Row, Col } from "antd";
+import { Form, Input, Button, Row, Col } from "antd";
 import {
   MailOutlined,
   LockOutlined,
@@ -10,22 +10,46 @@ import {
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/firebaseActions";
 import "./Style.css";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const onFinish = async (values) => {
     const { email, password } = values;
     setLoading(true);
     try {
+      // Step 1: Authenticate user
       const user = await loginUser(email, password);
-      alert(`Welcome back, ${user.email}`);
-      navigate("/workspace");
+
+      // Step 2: Fetch user role from Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const role = userData.role;
+
+        // Step 3: Redirect based on role
+        if (role === "Project Manager") {
+          navigate("/manager");
+        } else if (role === "Developer") {
+          navigate("/developer");
+        } else if (role === "Product Owner") {
+          navigate("/Productowner");
+        } else {
+          alert("Unknown role! Please contact support.");
+        }
+      } else {
+        alert("No user data found in Firestore!");
+      }
     } catch (error) {
-      alert(error.message);
+      alert(`Login failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <Row className="auth-container">
       {/* Left Panel - 60% */}

@@ -1,38 +1,64 @@
-.App {
+//app.css
+.manager-container {
+  font-family: 'Segoe UI', sans-serif;
+ padding:60;
+  background-color:white;
+}
+
+.header {
+  font-size: 32px;
+  color: #04419a;
+  margin-bottom: 20px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.section {
+  background: white;
+  padding: 20px;
+  margin-top: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.project-form input,
+.team-form input,
+.team-form select {
+  padding: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 200px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.project-form button,
+.team-form button {
+  padding: 10px 16px;
+  background-color: #04419a;
   color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.project-form button:hover,
+.team-form button:hover {
+  background-color: #022e6c;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.project-card {
+  background-color: #eef3fc;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.project-card:hover {
+  background-color: #dbe8fd;
+}
+
+.team-list {
+  margin-top: 10px;
 }

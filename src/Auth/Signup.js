@@ -92,6 +92,7 @@ const Signup = () => {
             <Select>
               <Option value="PM">Project Manager</Option>
               <Option value="Developer">Developer</Option>
+              <Option value="ProductOwner">Product Owner</Option> {/* ✅ Added */}
             </Select>
           </Form.Item>
           <Form.Item>

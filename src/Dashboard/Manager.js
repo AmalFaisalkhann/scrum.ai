@@ -1,192 +1,227 @@
-// src/pages/Manager.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
-import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { db, auth } from '../firebase';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 
-const trendData = [
-  { week: 'Week 1', velocity: 20, bugs: 12 },
-  { week: 'Week 2', velocity: 30, bugs: 9 },
-  { week: 'Week 3', velocity: 40, bugs: 7 },
-  { week: 'Week 4', velocity: 48, bugs: 4 },
+const usersFromSuperUser = ['Ali', 'Sara', 'Ahmed', 'Zainab']; // Sample users
+
+const dummyTrends = [
+  { name: 'Mon', value: 30 },
+  { name: 'Tue', value: 45 },
+  { name: 'Wed', value: 60 },
+  { name: 'Thu', value: 40 },
+  { name: 'Fri', value: 70 },
 ];
 
-// Dummy user list from Super Admin
-const superAdminUsers = [
-  'Ahsan Khan',
-  'Maria Ahmed',
-  'Ali Raza',
-  'Zoya Rehman',
-];
+const Manager = () => {
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [formData, setFormData] = useState({ name: '', id: '', timeline: '' });
+  const [teamData, setTeamData] = useState({ user: '', task: '', count: '' });
 
-function Manager() {
-  const [showAddTeam, setShowAddTeam] = useState(false);
-  const [addedUsers, setAddedUsers] = useState([]);
-  const [tokens, setTokens] = useState({});
+  // Load projects from Firestore
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!auth.currentUser) return;
+      const q = query(collection(db, 'projects'), where('created_by', '==', auth.currentUser.uid));
+      const querySnapshot = await getDocs(q);
+      const projectList = querySnapshot.docs.map(docSnap => ({ ...docSnap.data(), docId: docSnap.id }));
+      setProjects(projectList);
+    };
+    fetchProjects();
+  }, []);
 
-  const handleAddUser = (e) => {
-    e.preventDefault();
-    const selectedUser = e.target.user.value;
-    if (selectedUser && !addedUsers.includes(selectedUser)) {
-      setAddedUsers([...addedUsers, selectedUser]);
-      setTokens({ ...tokens, [selectedUser]: '' });
+  // Create project in Firestore
+  const handleProjectCreate = async () => {
+    try {
+      if (formData.name && formData.id && formData.timeline) {
+        await addDoc(collection(db, 'projects'), {
+          name: formData.name,
+          project_id: formData.id,
+          timeline: formData.timeline,
+          created_by: auth.currentUser.uid,
+          team: [],
+          created_at: new Date(),
+        });
+        setFormData({ name: '', id: '', timeline: '' });
+        alert('Project added!');
+        window.location.reload(); // reload to fetch new project
+      }
+    } catch (error) {
+      alert(`Error creating project: ${error.message}`);
     }
-    e.target.reset();
   };
 
-  const handleTokenChange = (user, value) => {
-    setTokens({ ...tokens, [user]: value });
+  // Add team member to Firestore
+  const handleAddToTeam = async () => {
+    if (!selectedProject?.docId || !teamData.user || !teamData.task || !teamData.count) return;
+    try {
+      const projRef = doc(db, 'projects', selectedProject.docId);
+      await updateDoc(projRef, {
+        team: arrayUnion({ ...teamData })
+      });
+      setTeamData({ user: '', task: '', count: '' });
+      alert('Team member added!');
+      window.location.reload();
+    } catch (error) {
+      alert(`Error adding to team: ${error.message}`);
+    }
   };
 
-  const handleAssignTokens = () => {
-    console.log('Assigned Tokens:', tokens);
-    alert('Tokens assigned!');
+  // Delete project from Firestore
+  const handleProjectDelete = async (id) => {
+    try {
+      const proj = projects.find(p => p.project_id === id);
+      if (proj?.docId) {
+        await deleteDoc(doc(db, 'projects', proj.docId));
+        alert('Project deleted!');
+        setProjects(projects.filter((p) => p.project_id !== id));
+        if (selectedProject?.project_id === id) setSelectedProject(null);
+      }
+    } catch (error) {
+      alert(`Error deleting project: ${error.message}`);
+    }
+  };
+
+  // Update project details
+  const handleProjectUpdate = async () => {
+    try {
+      if (!selectedProject?.docId) return;
+      const projRef = doc(db, 'projects', selectedProject.docId);
+      await updateDoc(projRef, {
+        name: selectedProject.name,
+        project_id: selectedProject.project_id,
+        timeline: selectedProject.timeline,
+      });
+      alert('Project updated!');
+      window.location.reload();
+    } catch (error) {
+      alert(`Error updating project: ${error.message}`);
+    }
+  };
+
+  // Delete a team member (remove from Firestore array)
+  const handleTaskDelete = async (index) => {
+    if (!selectedProject?.docId) return;
+    try {
+      const projRef = doc(db, 'projects', selectedProject.docId);
+      const updatedTeam = [...selectedProject.team];
+      updatedTeam.splice(index, 1);
+      await updateDoc(projRef, { team: updatedTeam });
+      setSelectedProject({ ...selectedProject, team: updatedTeam });
+      alert('Team member removed!');
+    } catch (error) {
+      alert(`Error removing member: ${error.message}`);
+    }
+  };
+
+  const countTeamInsights = () => {
+    return projects.map((proj) => ({
+      name: proj.name,
+      members: proj.team ? proj.team.length : 0,
+    }));
   };
 
   return (
-    <>
-      <header className="top-nav">
-        <h1>scrum.ai</h1>
-        <nav>
-          <ul>
-            <li>Dashboard</li>
-            <li>Team Insights</li>
-            <li>Analytics</li>
-            <li>Trends</li>
-            <li>Notifications</li>
-          </ul>
-        </nav>
-        <Link to="/developer" className="user-info">
-          <span className="user-icon">👤</span>
-          <span className="user-name">Project Manager</span>
-        </Link>
-      </header>
+    <div className="manager-container">
+      <h1 className="header">Manager Dashboard</h1>
 
-      <main className="container">
-
-        <div className="search-bar">
-          <input type="text" placeholder="Search team, tasks..." />
+      <div className="section">
+        <h2>+ Add Project</h2>
+        <div className="project-form">
+          <input placeholder="Project Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+          <input placeholder="Project ID" value={formData.id} onChange={(e) => setFormData({ ...formData, id: e.target.value })} />
+          <input placeholder="Timeline (e.g. 1 week)" value={formData.timeline} onChange={(e) => setFormData({ ...formData, timeline: e.target.value })} />
+          <button onClick={handleProjectCreate}>Create</button>
         </div>
-
-        {/* Team Add Button */}
-        {!showAddTeam && (
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <button onClick={() => setShowAddTeam(true)} className="primary-button">+ Add Team</button>
-          </div>
-        )}
-
-        {/* Add Team Form */}
-        {showAddTeam && (
-          <div className="card">
-            <h3>Add Users to Workspace Team</h3>
-            <form onSubmit={handleAddUser}>
-              <select name="user" required style={{ padding: '10px', width: '100%', marginBottom: '10px' }}>
-                <option value="">Select a user</option>
-                {superAdminUsers.map((user, idx) => (
-                  <option key={idx} value={user}>{user}</option>
-                ))}
-              </select>
-              <button type="submit" className="primary-button">Add to Team</button>
-            </form>
-          </div>
-        )}
-
-      
-      {/* Token Assignment Section */}
-{addedUsers.length > 0 && (
-  <div className="card assign" style={{ marginTop: '30px' }}>
-    <h2>Assign Work Tokens</h2>
-    {addedUsers.map((user, idx) => (
-      <div key={idx} style={{ marginBottom: '20px' }}>
-        <label><strong>{user}</strong></label>
-        <input
-          type="text"
-          placeholder="Task name (e.g., Fix login bug)"
-          value={tokens[user]?.task || ''}
-          onChange={(e) =>
-            setTokens({
-              ...tokens,
-              [user]: {
-                ...tokens[user],
-                task: e.target.value
-              }
-            })
-          }
-          style={{ width: '100%', padding: '8px', marginTop: '8px', marginBottom: '8px' }}
-        />
-        <input
-          type="number"
-          placeholder="Tokens (e.g., 3)"
-          value={tokens[user]?.token || ''}
-          onChange={(e) =>
-            setTokens({
-              ...tokens,
-              [user]: {
-                ...tokens[user],
-                token: e.target.value
-              }
-            })
-          }
-          style={{ width: '100%', padding: '8px' }}
-        />
       </div>
-    ))}
-    <button onClick={() => {
-      console.log('Assigned Tokens:', tokens);
-      alert('Tokens assigned successfully!');
-    }} className="primary-button">
-      Assign Tokens
-    </button>
-  </div>
-)}
 
-        <div className="side-by-side" style={{ marginTop: '40px' }}>
-          <section className="card summary">
-            <h2>Team Summary</h2>
-            <p><strong>Developers Active:</strong> {addedUsers.length}</p>
-            <p><strong>Tasks In Progress:</strong> 12</p>
-            <p><strong>Blockers Reported:</strong> 2</p>
-          </section>
+      <div className="section">
+        <h2>View & Edit Projects</h2>
+        {projects.length === 0 ? (
+          <p>No projects yet. Add one above.</p>
+        ) : (
+          projects.map((proj, index) => (
+            <div key={index} className="project-card">
+              <div onClick={() => setSelectedProject(proj)}>
+                <strong>{proj.name}</strong> | ID: {proj.project_id} | Timeline: {proj.timeline}
+              </div>
+              <button onClick={() => handleProjectDelete(proj.project_id)} style={{ marginLeft: '10px' }}>Delete</button>
+            </div>
+          ))
+        )}
+      </div>
 
-          <section className="card performance">
-            <h2>Performance Analytics</h2>
-            <ul>
-              <li><strong>Avg Task Completion:</strong> 3.2 days</li>
-              <li><strong>Standup Compliance:</strong> 85%</li>
-              <li><strong>Code Review Throughput:</strong> High</li>
-            </ul>
-          </section>
+      {selectedProject && (
+        <div className="section">
+          <h2>Manage Team for: {selectedProject.name}</h2>
+          <div className="project-edit-form">
+            <input value={selectedProject.name} onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })} />
+            <input value={selectedProject.project_id} onChange={(e) => setSelectedProject({ ...selectedProject, project_id: e.target.value })} />
+            <input value={selectedProject.timeline} onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })} />
+            <button onClick={handleProjectUpdate}>Update Project</button>
+          </div>
+
+          <div className="team-form">
+            <select value={teamData.user} onChange={(e) => setTeamData({ ...teamData, user: e.target.value })}>
+              <option value="">Select User</option>
+              {usersFromSuperUser.map((user, i) => (
+                <option key={i} value={user}>{user}</option>
+              ))}
+            </select>
+            <input placeholder="Task Name" value={teamData.task} onChange={(e) => setTeamData({ ...teamData, task: e.target.value })} />
+            <input placeholder="Task Count" value={teamData.count} onChange={(e) => setTeamData({ ...teamData, count: e.target.value })} />
+            <button onClick={handleAddToTeam}>Add to Team</button>
+          </div>
+
+          <div className="team-list">
+            {!selectedProject.team || selectedProject.team.length === 0 ? (
+              <p>No members in this project yet.</p>
+            ) : (
+              selectedProject.team.map((member, i) => (
+                <div key={i}>
+                  {member.user} - {member.task} ({member.count})
+                  <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
+      )}
 
-        <div className="side-by-side">
-          <section className="card trends">
-            <h2>Delivery Trends</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="velocity" stroke="#3f51b5" />
-                <Line type="monotone" dataKey="bugs" stroke="#e53935" />
-              </LineChart>
-            </ResponsiveContainer>
-          </section>
-        </div>
-      </main>
+      <div className="section">
+        <h2>Delivery Trends</h2>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={dummyTrends}>
+            <CartesianGrid stroke="#ccc" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#4a90e2" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-      <footer className="bottom-nav">
-        <ul>
-          <li>Home</li>
-          <li>Analytics</li>
-          <li>Team</li>
-          <li>Notification</li>
-        </ul>
-      </footer>
-    </>
+      <div className="section">
+        <h2>Team Insights</h2>
+        {projects.length === 0 ? (
+          <p>No data available</p>
+        ) : (
+          countTeamInsights().map((p, i) => (
+            <p key={i}>
+              {p.name} - {p.members} Members
+            </p>
+          ))
+        )}
+      </div>
+
+      <div className="section">
+        <h2>Performance Analysis</h2>
+        <p>Most tasks completed by: Sara (12)</p>
+      </div>
+    </div>
   );
-}
+};
 
 export default Manager;
