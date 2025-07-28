@@ -13,7 +13,6 @@ src/firebase.js
 # production
 /build
 
-
 # misc
 .DS_Store
 .env.local
@@ -27,6 +26,8 @@ yarn-error.log*
 
 /src/firebase.js
 
-/backend/serviceAccountKey.json
+# Backend environment and service account files
+backend/.env
+backend/serviceAccountKey.json
 backend\.env
-backend\serviceAccountKey.json
+backend\serviceAccountKey.json 
