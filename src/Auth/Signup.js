@@ -90,9 +90,9 @@ const Signup = () => {
           </Form.Item>
           <Form.Item label="Role" name="role" initialValue="Developer">
             <Select>
-              <Option value="PM">Project Manager</Option>
+              <Option value="Project Manager">Project Manager</Option>
               <Option value="Developer">Developer</Option>
-              <Option value="ProductOwner">Product Owner</Option> {/* ✅ Added */}
+              <Option value="Product Owner">Product Owner</Option> {/* ✅ Added */}
             </Select>
           </Form.Item>
           <Form.Item>
