@@ -11,7 +11,7 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 2rem;
 }
 
 .header {
@@ -23,6 +23,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 0;
 }
 
 .logo {
@@ -53,10 +54,18 @@ body {
   color: #374151;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .link-button:hover {
   color:rgb(4, 93, 165);
+}
+
+.icon-small {
+  width: 1rem;
+  height: 1rem;
 }
 
 .primary-button {
