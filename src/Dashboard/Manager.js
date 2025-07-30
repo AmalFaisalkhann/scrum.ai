@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import '../App.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { db, auth } from '../firebase';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, arrayUnion } from 'firebase/firestore';
+import {
+  collection, addDoc, updateDoc, deleteDoc, doc,
+  getDocs, query, where, arrayUnion
+} from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const usersFromSuperUser = ['Ali', 'Sara', 'Ahmed', 'Zainab']; // Sample users
+const usersFromSuperUser = ['Ali', 'Sara', 'Ahmed', 'Zainab'];
 
 const dummyTrends = [
   { name: 'Mon', value: 30 },
@@ -18,31 +21,23 @@ const dummyTrends = [
 const Manager = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '', timeline: '' });
-  const [teamData, setTeamData] = useState({ user: '', task: '', count: '', role: 'Developer' });
+  const [formData, setFormData] = useState({ name: '', id: '', timeline: '' });
+  const [teamData, setTeamData] = useState({ user: '', task: '', count: '', token: '' });
 
-  // Load projects from Firestore
   useEffect(() => {
-    const fetchProjects = async () => {
-      if (!auth.currentUser) return;
-      try {
-        const q = query(collection(db, 'projects'), where('created_by', '==', auth.currentUser.uid));
-        const querySnapshot = await getDocs(q);
-        const projectList = querySnapshot.docs.map(docSnap => ({
-          ...docSnap.data(),
-          docId: docSnap.id,
-          source: 'main',
-        }));
-        setProjects(projectList);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        alert(`Error fetching projects: ${error.message}`);
-      }
+    const fetchProjects = async (user) => {
+      const q = query(collection(db, 'projects'), where('created_by', '==', user.uid));
+      const snapshot = await getDocs(q);
+      const projectList = snapshot.docs.map(docSnap => ({
+        ...docSnap.data(),
+        docId: docSnap.id,
+      }));
+      setProjects(projectList);
     };
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        fetchProjects();
+        fetchProjects(user);
       } else {
         setProjects([]);
       }
@@ -51,89 +46,70 @@ const Manager = () => {
     return () => unsubscribe();
   }, []);
 
-  // Create project in Firestore
   const handleProjectCreate = async () => {
-    try {
-      if (formData.name && formData.description && formData.timeline) {
-        const docRef = await addDoc(collection(db, 'projects'), {
-          name: formData.name,
-          description: formData.description,
-          timeline: formData.timeline,
-          created_by: auth.currentUser.uid,
-          team: [],
-          created_at: new Date(),
-        });
-        await updateDoc(docRef, { project_id: docRef.id });
-        setFormData({ name: '', description: '', timeline: '' });
-        alert('Project added!');
-        window.location.reload();
-      }
-    } catch (error) {
-      alert(`Error creating project: ${error.message}`);
+    if (formData.name && formData.id && formData.timeline) {
+      const docRef = await addDoc(collection(db, 'projects'), {
+        name: formData.name,
+        id: formData.id,
+        timeline: formData.timeline,
+        created_by: auth.currentUser.uid,
+        team: [],
+        created_at: new Date()
+      });
+      await updateDoc(docRef, { project_id: docRef.id });
+      setFormData({ name: '', id: '', timeline: '' });
+      alert('Project created!');
+      window.location.reload();
     }
   };
 
-  // Add team member to Firestore
   const handleAddToTeam = async () => {
     if (!selectedProject?.docId || !teamData.user || !teamData.task || !teamData.count) return;
-    try {
-      const projRef = doc(db, 'projects', selectedProject.docId);
-      await updateDoc(projRef, {
-        team: arrayUnion({ ...teamData, role: teamData.role || 'Developer' }),
-      });
-      setTeamData({ user: '', task: '', count: '', role: 'Developer' });
-      alert('Team member added!');
-      window.location.reload();
-    } catch (error) {
-      alert(`Error adding to team: ${error.message}`);
-    }
+    const projRef = doc(db, 'projects', selectedProject.docId);
+    await updateDoc(projRef, {
+      team: arrayUnion({ ...teamData })
+    });
+    setTeamData({ user: '', task: '', count: '', token: '' });
+    alert('Team member added!');
+    window.location.reload();
   };
 
-  // Delete project from Firestore
   const handleProjectDelete = async (id) => {
-    try {
-      const proj = projects.find(p => p.docId === id);
-      if (proj?.docId) {
-        await deleteDoc(doc(db, 'projects', proj.docId));
-        alert('Project deleted!');
-        setProjects(projects.filter((p) => p.docId !== id));
-        if (selectedProject?.docId === id) setSelectedProject(null);
-      }
-    } catch (error) {
-      alert(`Error deleting project: ${error.message}`);
+    const proj = projects.find(p => p.docId === id);
+    if (proj?.docId) {
+      await deleteDoc(doc(db, 'projects', proj.docId));
+      alert('Project deleted!');
+      setProjects(projects.filter(p => p.docId !== id));
+      if (selectedProject?.docId === id) setSelectedProject(null);
     }
   };
 
-  // Update project details
   const handleProjectUpdate = async () => {
-    try {
-      if (!selectedProject?.docId) return;
-      const projRef = doc(db, 'projects', selectedProject.docId);
-      await updateDoc(projRef, {
-        name: selectedProject.name,
-        description: selectedProject.description,
-        timeline: selectedProject.timeline,
-      });
-      alert('Project updated!');
-      window.location.reload();
-    } catch (error) {
-      alert(`Error updating project: ${error.message}`);
-    }
+    if (!selectedProject?.docId) return;
+    const projRef = doc(db, 'projects', selectedProject.docId);
+    await updateDoc(projRef, {
+      name: selectedProject.name,
+      id: selectedProject.id,
+      timeline: selectedProject.timeline
+    });
+    alert('Project updated!');
+    window.location.reload();
   };
 
-  // Delete a team member
   const handleTaskDelete = async (index) => {
     if (!selectedProject?.docId) return;
-    try {
-      const projRef = doc(db, 'projects', selectedProject.docId);
-      const updatedTeam = [...selectedProject.team];
-      updatedTeam.splice(index, 1);
-      await updateDoc(projRef, { team: updatedTeam });
-      setSelectedProject({ ...selectedProject, team: updatedTeam });
-      alert('Team member removed!');
-    } catch (error) {
-      alert(`Error removing member: ${error.message}`);
-    }
+    const updatedTeam = [...selectedProject.team];
+    updatedTeam.splice(index, 1);
+    await updateDoc(doc(db, 'projects', selectedProject.docId), { team: updatedTeam });
+    setSelectedProject({ ...selectedProject, team: updatedTeam });
+  };
+
+  const handleTokenAssign = async (index, tokenValue) => {
+    const updatedTeam = selectedProject.team.map((member, i) =>
+      i === index ? { ...member, token: tokenValue } : member
+    );
+    await updateDoc(doc(db, 'projects', selectedProject.docId), { team: updatedTeam });
+    setSelectedProject({ ...selectedProject, team: updatedTeam });
   };
 
   const countTeamInsights = () => {
@@ -145,26 +121,26 @@ const Manager = () => {
 
   return (
     <div className="manager-container">
-      <h1 className="header">Manager Dashboard</h1>
+      <header className="top-nav">
+        <h1>scrum.ai</h1>
+        <nav>
+          <ul>
+            <li>Dashboard</li>
+            <li>Feedback</li>
+            <li>Notifications</li>
+          </ul>
+        </nav>
+        <div className="user-info">
+          <span className="user-name">Manager</span>
+        </div>
+      </header>
 
       <div className="section">
         <h2>+ Add Project</h2>
         <div className="project-form">
-          <input
-            placeholder="Project Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-          <input
-            placeholder="Project Description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
-          <input
-            placeholder="Timeline (e.g. 96 hrs)"
-            value={formData.timeline}
-            onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-          />
+          <input placeholder="Project Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+          <input placeholder="Project Description" value={formData.id} onChange={(e) => setFormData({ ...formData, id: e.target.value })} />
+          <input placeholder="Timeline (e.g. 1 week)" value={formData.timeline} onChange={(e) => setFormData({ ...formData, timeline: e.target.value })} />
           <button onClick={handleProjectCreate}>Create</button>
         </div>
       </div>
@@ -177,7 +153,7 @@ const Manager = () => {
           projects.map((proj, index) => (
             <div key={index} className="project-card">
               <div onClick={() => setSelectedProject(proj)}>
-                <strong>{proj.name}</strong> | Description: {proj.description} | Timeline: {proj.timeline}
+                <strong>{proj.name}</strong> | ID: {proj.id} | Timeline: {proj.timeline}
               </div>
               <button onClick={() => handleProjectDelete(proj.docId)} style={{ marginLeft: '10px' }}>Delete</button>
             </div>
@@ -189,18 +165,9 @@ const Manager = () => {
         <div className="section">
           <h2>Manage Team for: {selectedProject.name}</h2>
           <div className="project-edit-form">
-            <input
-              value={selectedProject.name}
-              onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })}
-            />
-            <input
-              value={selectedProject.description}
-              onChange={(e) => setSelectedProject({ ...selectedProject, description: e.target.value })}
-            />
-            <input
-              value={selectedProject.timeline}
-              onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })}
-            />
+            <input value={selectedProject.name} onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })} />
+            <input value={selectedProject.id} onChange={(e) => setSelectedProject({ ...selectedProject, id: e.target.value })} />
+            <input value={selectedProject.timeline} onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })} />
             <button onClick={handleProjectUpdate}>Update Project</button>
           </div>
 
@@ -211,23 +178,8 @@ const Manager = () => {
                 <option key={i} value={user}>{user}</option>
               ))}
             </select>
-            <input
-              placeholder="Task Name"
-              value={teamData.task}
-              onChange={(e) => setTeamData({ ...teamData, task: e.target.value })}
-            />
-            <input
-              placeholder="Task Count"
-              value={teamData.count}
-              onChange={(e) => setTeamData({ ...teamData, count: e.target.value })}
-            />
-            <select value={teamData.role} onChange={(e) => setTeamData({ ...teamData, role: e.target.value })}>
-              <option value="Developer">Developer</option>
-              <option value="Product Owner">Product Owner</option>
-              <option value="Project Manager">Project Manager</option>
-              <option value="Designer">Designer</option>
-              <option value="QA">QA</option>
-            </select>
+            <input placeholder="Task Name" value={teamData.task} onChange={(e) => setTeamData({ ...teamData, task: e.target.value })} />
+            <input placeholder="Task Count" value={teamData.count} onChange={(e) => setTeamData({ ...teamData, count: e.target.value })} />
             <button onClick={handleAddToTeam}>Add to Team</button>
           </div>
 
@@ -236,8 +188,13 @@ const Manager = () => {
               <p>No members in this project yet.</p>
             ) : (
               selectedProject.team.map((member, i) => (
-                <div key={i}>
-                  {member.user} - {member.task} ({member.count}) [{member.role || 'Developer'}]
+                <div key={i} className="team-member-token">
+                  <span>{member.user} - {member.task} ({member.count})</span>
+                  <input
+                    placeholder="Assign Token"
+                    value={member.token || ''}
+                    onChange={(e) => handleTokenAssign(i, e.target.value)}
+                  />
                   <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
                 </div>
               ))
@@ -265,9 +222,7 @@ const Manager = () => {
           <p>No data available</p>
         ) : (
           countTeamInsights().map((p, i) => (
-            <p key={i}>
-              {p.name} - {p.members} Members
-            </p>
+            <p key={i}>{p.name} - {p.members} Members</p>
           ))
         )}
       </div>
@@ -276,6 +231,15 @@ const Manager = () => {
         <h2>Performance Analysis</h2>
         <p>Most tasks completed by: Sara (12)</p>
       </div>
+
+      <footer className="bottom-nav">
+        <ul>
+          <li>Home</li>
+          <li>Submit</li>
+          <li>Task</li>
+          <li>Notification</li>
+        </ul>
+      </footer>
     </div>
   );
 };
