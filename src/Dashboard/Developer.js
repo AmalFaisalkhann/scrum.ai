@@ -4,6 +4,25 @@ import { Link } from 'react-router-dom';
 import '../App.css';
 
 function Developer() {
+  // Sample data for assigned projects and tokens
+  const assignedProjects = [
+    {
+      name: 'AI Dashboard',
+      timeline: 'July 20 - Aug 10',
+      tokens: [
+        { tokenId: 'TK-123', task: 'Fix API bug', status: 'In Progress' },
+        { tokenId: 'TK-125', task: 'Implement chart view', status: 'Todo' },
+      ],
+    },
+    {
+      name: 'Login Revamp',
+      timeline: 'Aug 1 - Aug 5',
+      tokens: [
+        { tokenId: 'TK-127', task: 'Add forgot password', status: 'Done ✅' },
+      ],
+    },
+  ];
+
   return (
     <>
       <header className="top-nav">
@@ -12,7 +31,7 @@ function Developer() {
           <ul>
             <li>Dashboard</li>
             <li>Sprint Standups</li>
-            <li>My Tasks</li>
+            <li>My Projects</li>
             <li>Team Updates</li>
             <li>Notifications</li>
           </ul>
@@ -34,40 +53,30 @@ function Developer() {
             <button>Submit</button>
           </section>
 
-          <section className="card tasks">
-            <h2>My Tasks</h2>
-            <div className="task">
-              <h3>Integrate backend API</h3>
-              <progress value="60" max="100" />
-              <p>Status: In Progress</p>
-            </div>
-            <div className="task">
-              <h3>Update project documentation</h3>
-              <progress value="20" max="100" />
-              <p>Status: Todo</p>
-            </div>
-            <div className="task">
-              <h3>Code review: Auth module</h3>
-              <progress value="100" max="100" />
-              <p>Status: Done ✅</p>
-            </div>
+          <section className="card projects">
+            <h2>My Assigned Projects</h2>
+            {assignedProjects.map((project, index) => (
+              <div key={index} className="project-block">
+                <h3>{project.name}</h3>
+                <p><strong>Timeline:</strong> {project.timeline}</p>
+                <ul>
+                  {project.tokens.map((token, idx) => (
+                    <li key={idx}>
+                      <strong>{token.tokenId}</strong>: {token.task} — <em>{token.status}</em>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </section>
         </div>
-
-        <section className="card ai-suggestions">
-          <h2>AI Suggestions</h2>
-          <ul>
-            <li> Prioritize high-effort tasks first.</li>
-            <li>"project doc" is delayed — recommend splitting.</li>
-          </ul>
-        </section>
       </main>
 
       <footer className="bottom-nav">
         <ul>
-          <li> Home</li>
+          <li>Home</li>
           <li>Submit</li>
-          <li> Task</li>
+          <li>Projects</li>
           <li>Notification</li>
         </ul>
       </footer>
@@ -75,4 +84,4 @@ function Developer() {
   );
 }
 
-export default Developer;
+export default Developer;
