@@ -8,8 +8,6 @@ import {
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const usersFromSuperUser = ['Ali', 'Sara', 'Ahmed', 'Zainab'];
-
 const dummyTrends = [
   { name: 'Mon', value: 30 },
   { name: 'Tue', value: 45 },
@@ -22,7 +20,8 @@ const Manager = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [formData, setFormData] = useState({ name: '', id: '', timeline: '' });
-  const [teamData, setTeamData] = useState({ user: '', task: '', count: '', token: '' });
+  const [teamData, setTeamData] = useState({ user: '', token: '' });
+  const [developerUsers, setDeveloperUsers] = useState([]);
 
   useEffect(() => {
     const fetchProjects = async (user) => {
@@ -35,9 +34,17 @@ const Manager = () => {
       setProjects(projectList);
     };
 
+    const fetchDevelopers = async () => {
+      const q = query(collection(db, 'users'), where('role', '==', 'Developer'));
+      const snapshot = await getDocs(q);
+      const devs = snapshot.docs.map(doc => doc.data().name || doc.data().email);
+      setDeveloperUsers(devs);
+    };
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchProjects(user);
+        fetchDevelopers();
       } else {
         setProjects([]);
       }
@@ -64,12 +71,12 @@ const Manager = () => {
   };
 
   const handleAddToTeam = async () => {
-    if (!selectedProject?.docId || !teamData.user || !teamData.task || !teamData.count) return;
+    if (!selectedProject?.docId || !teamData.user) return;
     const projRef = doc(db, 'projects', selectedProject.docId);
     await updateDoc(projRef, {
       team: arrayUnion({ ...teamData })
     });
-    setTeamData({ user: '', task: '', count: '', token: '' });
+    setTeamData({ user: '', token: '' });
     alert('Team member added!');
     window.location.reload();
   };
@@ -173,13 +180,11 @@ const Manager = () => {
 
           <div className="team-form">
             <select value={teamData.user} onChange={(e) => setTeamData({ ...teamData, user: e.target.value })}>
-              <option value="">Select User</option>
-              {usersFromSuperUser.map((user, i) => (
+              <option value="">Select Developer</option>
+              {developerUsers.map((user, i) => (
                 <option key={i} value={user}>{user}</option>
               ))}
             </select>
-            <input placeholder="Task Name" value={teamData.task} onChange={(e) => setTeamData({ ...teamData, task: e.target.value })} />
-            <input placeholder="Task Count" value={teamData.count} onChange={(e) => setTeamData({ ...teamData, count: e.target.value })} />
             <button onClick={handleAddToTeam}>Add to Team</button>
           </div>
 
@@ -189,7 +194,7 @@ const Manager = () => {
             ) : (
               selectedProject.team.map((member, i) => (
                 <div key={i} className="team-member-token">
-                  <span>{member.user} - {member.task} ({member.count})</span>
+                  <span>{member.user}</span>
                   <input
                     placeholder="Assign Token"
                     value={member.token || ''}
