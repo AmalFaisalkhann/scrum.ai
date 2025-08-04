@@ -1,3 +1,6 @@
+
+
+//firebase.js
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -10,13 +13,13 @@ import { getDocs, collection } from 'firebase/firestore';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyCJBiLon8vYqk5EhDZ47s7uqMZuwljKQF8",
+  authDomain: "scrum-92451.firebaseapp.com",
+  projectId: "scrum-92451",
+  storageBucket: "scrum-92451.firebasestorage.app",
+  messagingSenderId: "641839499000",
+  appId: "1:641839499000:web:ff95b213adbd6d6dec5d0d",
+  measurementId: "G-Y6766EMEHH"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -32,10 +35,3 @@ export const getAllUsers = async () => {
   const snapshot = await getDocs(collection(db, 'users')); // or 'adminUsers' if that's your collection
   return snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
 };
-
-
-
-
-
-
-
