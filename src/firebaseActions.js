@@ -28,6 +28,7 @@ export const createWorkspace = async (workspaceName, userId) => {
 export const createProjectInWorkspace = async (workspaceId, projectName) => {
   const projectRef = await addDoc(collection(db, `workspaces/${workspaceId}/projects`), {
     name: projectName,
+    state: "new", // Initialize with "new" state
     created_at: new Date(),
   });
   return projectRef.id;

@@ -89,27 +89,7 @@ body, html {
   font-weight: 500;
   transition: 0.3s;
 }
-/* Enhanced multi-select styling */
-.project-form select[multiple] {
-  width: 100% !important;
-  max-width: 400px;
-  height: 120px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-right: 0;
-}
 
-.project-form select[multiple] option {
-  padding: 4px 8px;
-  margin: 1px 0;
-}
-
-.project-form select[multiple] option:checked {
-  background-color: #045da5;
-  color: white;
-}
 .project-form button:hover,
 .project-edit-form button:hover,
 .team-form button:hover,
