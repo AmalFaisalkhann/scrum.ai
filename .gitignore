@@ -8,6 +8,8 @@
 # testing
 /coverage
 
+#firebase key
+src/firebase.js
 # production
 /build
 
@@ -22,8 +24,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+/src/firebase.js
+
 # Backend environment and service account files
 backend/.env
 backend/serviceAccountKey.json
 backend\.env
-backend\serviceAccountKey.json
+backend\serviceAccountKey.json 
+
+d
