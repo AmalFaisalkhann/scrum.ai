@@ -82,8 +82,29 @@ The agentic workflow follows this sequence:
 The workflow automatically:
 - Creates unique project IDs
 - Sets up developer profiles
+- **Waits for real standups for 5 minutes per cycle**
 - Configures scrum cycle duration (default: 24 hours)
 - Manages up to 10 scrum cycles by default
+
+### Standup Submission
+
+The workflow now waits for real standups instead of using dummy data:
+
+1. **During the waiting period** (5 minutes), developers can submit standups
+2. **Standup submission** can be done via:
+   - Frontend application (if available)
+   - Direct Firebase operations
+   - Using the `submit_test_standup` tool for testing
+
+3. **Test standup submission**:
+   ```bash
+   python test_standup_submission.py
+   ```
+
+4. **Workflow behavior**:
+   - Waits up to 5 minutes for all developers to submit standups
+   - Proceeds immediately if all standups are submitted
+   - Continues with available standups after timeout
 
 ### Customizing the Workflow
 
@@ -140,6 +161,7 @@ scrum.ai-agents/
 - `get_standup_status()`: Check standup completion status
 - `create_standup_template()`: Generate standup templates
 - `save_standup()`: Save completed standups
+- `submit_test_standup()`: Submit test standups for development
 
 ### Ticket Generation Tools
 - `generate_project_tickets()`: Create tickets based on context

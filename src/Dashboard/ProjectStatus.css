@@ -1,0 +1,286 @@
+.project-status-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e1e5e9;
+}
+
+.project-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+}
+
+.status-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.project-description,
+.project-team,
+.user-tickets,
+.user-standups,
+.project-summaries {
+  margin-bottom: 30px;
+}
+
+.project-description h3,
+.project-team h3,
+.user-tickets h3,
+.user-standups h3,
+.project-summaries h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #e1e5e9;
+  padding-bottom: 8px;
+}
+
+.project-description p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.team-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.team-member {
+  padding: 15px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  background: #f8f9fa;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.member-email {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.member-role {
+  color: #007bff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.tickets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ticket-item {
+  padding: 15px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+  transition: box-shadow 0.3s ease;
+}
+
+.ticket-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.ticket-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.priority-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-badge.high {
+  background: #dc3545;
+  color: white;
+}
+
+.priority-badge.medium {
+  background: #ffc107;
+  color: #333;
+}
+
+.priority-badge.low {
+  background: #28a745;
+  color: white;
+}
+
+.ticket-description {
+  color: #666;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.ticket-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+}
+
+.ticket-status {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.ticket-hours {
+  color: #666;
+}
+
+.no-tickets,
+.no-standups {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.standups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.standup-item {
+  padding: 15px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+}
+
+.standup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.cycle-number {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.standup-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.standup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.standup-section {
+  color: #333;
+  line-height: 1.5;
+}
+
+.standup-section strong {
+  color: #555;
+}
+
+.summary-item {
+  padding: 15px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  background: #f8f9fa;
+  margin-bottom: 15px;
+}
+
+.summary-item h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.summary-item p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.error {
+  color: #dc3545;
+  text-align: center;
+  padding: 20px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .project-status-container {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .project-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .project-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .team-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .ticket-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .standup-header {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+} 

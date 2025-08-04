@@ -119,6 +119,9 @@ Development Phases:
 
     print(f"\n🚀 Starting Scrum AI workflow for project: {project_id}")
     print("=" * 60)
+    print(f"📋 Project will wait for real standups for 5 minutes per cycle")
+    print(f"👥 Developers: {[dev['name'] for dev in dev_profiles]}")
+    print("=" * 60)
 
     NUM_CYCLES = 3
     state = initial_state
@@ -130,7 +133,9 @@ Development Phases:
         else:
             # Subsequent cycles: skip StoreProjectContext
             state = graph.invoke({**state, "next_node": "GatherContext"})
-        insert_sample_standups(project_id, cycle, dev_profiles)
+        
+        # Note: No more dummy standup insertion - workflow will wait for real standups
+        print(f"⏳ Cycle {cycle}: Waiting for real standups...")
         state = graph.invoke({**state, "done": False})
 
     # --- Print the summary for each cycle ---

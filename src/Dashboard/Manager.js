@@ -8,6 +8,8 @@ import {
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { apiService } from '../services/api';
+import CreateProject from './CreateProject';
+import ProjectStatus from './ProjectStatus';
 
 const dummyTrends = [
   { name: 'Mon', value: 30 },
@@ -63,6 +65,9 @@ const Manager = () => {
   const [teamData, setTeamData] = useState({ user: '', token: '' });
   const [developerUsers, setDeveloperUsers] = useState([]);
   const [backendStatus, setBackendStatus] = useState('unknown'); // Used in UI
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showProjectStatus, setShowProjectStatus] = useState(false);
+  const [currentWorkspaceId, setCurrentWorkspaceId] = useState(null);
 
   // Add CSS styles for project cards and state badges
   const projectCardStyle = {
@@ -112,11 +117,30 @@ const Manager = () => {
       }
     };
 
+    const fetchUserWorkspace = async (user) => {
+      try {
+        const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
+        const userSnapshot = await getDocs(userQuery);
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          setCurrentWorkspaceId(userData.workspace_id || 'default');
+          console.log('User workspace ID:', userData.workspace_id || 'default');
+        } else {
+          console.log('No user document found, using default workspace');
+          setCurrentWorkspaceId('default');
+        }
+      } catch (error) {
+        console.error('Error fetching user workspace:', error);
+        setCurrentWorkspaceId('default');
+      }
+    };
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchProjects(user);
         fetchDevelopers();
         checkBackendStatus();
+        fetchUserWorkspace(user);
       } else {
         setProjects([]);
       }
@@ -227,6 +251,17 @@ const Manager = () => {
     }));
   };
 
+  const handleProjectCreated = (projectId) => {
+    setShowCreateProject(false);
+    // Refresh projects list
+    window.location.reload();
+  };
+
+  const handleViewProjectStatus = (projectId) => {
+    setSelectedProject(projects.find(p => p.docId === projectId));
+    setShowProjectStatus(true);
+  };
+
   return (
     <div className="manager-container">
       <header className="top-nav">
@@ -250,136 +285,162 @@ const Manager = () => {
         </div>
       </header>
 
-      <div className="section">
-        <h2>+ Add Project</h2>
-        <div className="project-form">
-          <input 
-            placeholder="Project Name" 
-            value={formData.name} 
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
-          />
-          <input 
-            placeholder="Project Description" 
-            value={formData.id} 
-            onChange={(e) => setFormData({ ...formData, id: e.target.value })} 
-          />
-          <input 
-            placeholder="Timeline (e.g. 1 week)" 
-            value={formData.timeline} 
-            onChange={(e) => setFormData({ ...formData, timeline: e.target.value })} 
-          />
-          <select 
-            value={formData.state} 
-            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-          >
-            <option value="new">New</option>
-            <option value="running">Running</option>
-            <option value="waiting">Waiting</option>
-            <option value="completed">Completed</option>
-          </select>
-          <button onClick={handleProjectCreate}>Create</button>
-        </div>
-      </div>
-
-      <div className="section">
-        <h2>View & Edit Projects</h2>
-        {projects.length === 0 ? (
-          <p>No projects yet. Add one above.</p>
-        ) : (
-          projects.map((proj, index) => (
-            <div key={index} style={projectCardStyle} onMouseEnter={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'} onMouseLeave={(e) => e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'}>
-              <div onClick={() => setSelectedProject(proj)}>
-                <strong>{proj.name}</strong> | ID: {proj.id} | Timeline: {proj.timeline}
-                <div style={{ marginTop: '8px' }}>
-                  <StateBadge state={proj.state || 'new'} />
-                  <select 
-                    value={proj.state || 'new'} 
-                    onChange={(e) => handleStateChange(proj.docId, e.target.value)}
-                    style={stateSelectStyle}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <option value="new">New</option>
-                    <option value="running">Running</option>
-                    <option value="waiting">Waiting</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                </div>
-              </div>
-              <button onClick={() => handleProjectDelete(proj.docId)} style={{ marginLeft: '10px' }}>Delete</button>
-            </div>
-          ))
-        )}
-      </div>
-
-      {selectedProject && (
+      {showCreateProject ? (
         <div className="section">
-          <h2>Manage Team for: {selectedProject.name}</h2>
-          <div className="project-edit-form">
-            <input value={selectedProject.name} onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })} />
-            <input value={selectedProject.id} onChange={(e) => setSelectedProject({ ...selectedProject, id: e.target.value })} />
-            <input value={selectedProject.timeline} onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })} />
-            <button onClick={handleProjectUpdate}>Update Project</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2>Create New Project</h2>
+            <button 
+              onClick={() => setShowCreateProject(false)}
+              style={{ padding: '8px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+          <CreateProject 
+            workspaceId={currentWorkspaceId} 
+            onProjectCreated={handleProjectCreated}
+          />
+        </div>
+      ) : showProjectStatus && selectedProject ? (
+        <div className="section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2>Project Status: {selectedProject.name}</h2>
+            <button 
+              onClick={() => setShowProjectStatus(false)}
+              style={{ padding: '8px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Back to Projects
+            </button>
+          </div>
+          <ProjectStatus projectId={selectedProject.docId} />
+        </div>
+      ) : (
+        <>
+          <div className="section">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Project Management</h2>
+              <button 
+                onClick={() => setShowCreateProject(true)}
+                style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+              >
+                + Create New Project
+              </button>
+            </div>
           </div>
 
-          <div className="team-form">
-            <select value={teamData.user} onChange={(e) => setTeamData({ ...teamData, user: e.target.value })}>
-              <option value="">Select Developer</option>
-              {developerUsers.map((user, i) => (
-                <option key={i} value={user}>{user}</option>
-              ))}
-            </select>
-            <button onClick={handleAddToTeam}>Add to Team</button>
-          </div>
-
-          <div className="team-list">
-            {!selectedProject.team || selectedProject.team.length === 0 ? (
-              <p>No members in this project yet.</p>
+          <div className="section">
+            <h2>View & Edit Projects</h2>
+            {projects.length === 0 ? (
+              <p>No projects yet. Create one using the button above.</p>
             ) : (
-              selectedProject.team.map((member, i) => (
-                <div key={i} className="team-member-token">
-                  <span>{member.user}</span>
-                  <input
-                    placeholder="Assign Token"
-                    value={member.token || ''}
-                    onChange={(e) => handleTokenAssign(i, e.target.value)}
-                  />
-                  <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
+              projects.map((proj, index) => (
+                <div key={index} style={projectCardStyle} onMouseEnter={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'} onMouseLeave={(e) => e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'}>
+                  <div onClick={() => setSelectedProject(proj)}>
+                    <strong>{proj.name}</strong> | ID: {proj.id} | Timeline: {proj.timeline}
+                    <div style={{ marginTop: '8px' }}>
+                      <StateBadge state={proj.state || 'new'} />
+                      <select 
+                        value={proj.state || 'new'} 
+                        onChange={(e) => handleStateChange(proj.docId, e.target.value)}
+                        style={stateSelectStyle}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <option value="new">New</option>
+                        <option value="running">Running</option>
+                        <option value="waiting">Waiting</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ marginTop: '10px' }}>
+                    <button 
+                      onClick={() => handleViewProjectStatus(proj.docId)}
+                      style={{ marginRight: '10px', padding: '6px 12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      View Status
+                    </button>
+                    <button 
+                      onClick={() => handleProjectDelete(proj.docId)} 
+                      style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))
             )}
           </div>
-        </div>
+
+          {selectedProject && !showProjectStatus && (
+            <div className="section">
+              <h2>Manage Team for: {selectedProject.name}</h2>
+              <div className="project-edit-form">
+                <input value={selectedProject.name} onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })} />
+                <input value={selectedProject.id} onChange={(e) => setSelectedProject({ ...selectedProject, id: e.target.value })} />
+                <input value={selectedProject.timeline} onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })} />
+                <button onClick={handleProjectUpdate}>Update Project</button>
+              </div>
+
+              <div className="team-form">
+                <select value={teamData.user} onChange={(e) => setTeamData({ ...teamData, user: e.target.value })}>
+                  <option value="">Select Developer</option>
+                  {developerUsers.map((user, i) => (
+                    <option key={i} value={user}>{user}</option>
+                  ))}
+                </select>
+                <button onClick={handleAddToTeam}>Add to Team</button>
+              </div>
+
+              <div className="team-list">
+                {!selectedProject.team || selectedProject.team.length === 0 ? (
+                  <p>No members in this project yet.</p>
+                ) : (
+                  selectedProject.team.map((member, i) => (
+                    <div key={i} className="team-member-token">
+                      <span>{member.user}</span>
+                      <input
+                        placeholder="Assign Token"
+                        value={member.token || ''}
+                        onChange={(e) => handleTokenAssign(i, e.target.value)}
+                      />
+                      <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="section">
+            <h2>Delivery Trends</h2>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={dummyTrends}>
+                <CartesianGrid stroke="#ccc" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#4a90e2" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="section">
+            <h2>Team Insights</h2>
+            {projects.length === 0 ? (
+              <p>No data available</p>
+            ) : (
+              countTeamInsights().map((p, i) => (
+                <p key={i}>{p.name} - {p.members} Members</p>
+              ))
+            )}
+          </div>
+
+          <div className="section">
+            <h2>Performance Analysis</h2>
+            <p>Most tasks completed by: Sara (12)</p>
+          </div>
+        </>
       )}
-
-      <div className="section">
-        <h2>Delivery Trends</h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={dummyTrends}>
-            <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" fill="#4a90e2" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="section">
-        <h2>Team Insights</h2>
-        {projects.length === 0 ? (
-          <p>No data available</p>
-        ) : (
-          countTeamInsights().map((p, i) => (
-            <p key={i}>{p.name} - {p.members} Members</p>
-          ))
-        )}
-      </div>
-
-      <div className="section">
-        <h2>Performance Analysis</h2>
-        <p>Most tasks completed by: Sara (12)</p>
-      </div>
 
       <footer className="bottom-nav">
         <ul>

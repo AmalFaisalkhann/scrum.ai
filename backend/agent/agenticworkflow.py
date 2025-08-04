@@ -17,7 +17,7 @@ from agentic.tool.scrum_timer import (
     is_scrum_time_reached, get_cycle_timing_info, set_cycle_start_time
 )
 from agentic.tool.standup_fetcher import (
-    get_all_standups, get_standup_status, get_standup_summary_data
+    get_all_standups, get_standup_status, get_standup_summary_data, submit_test_standup
 )
 from agentic.tool.ticket_generator import (
     generate_project_tickets, analyze_developer_workload, 
@@ -42,7 +42,7 @@ class ScrumGraphBuilder:
             get_project_tickets, get_scrum_history, save_scrum_cycle_summary,
             get_project_config, update_project_config,
             is_scrum_time_reached, get_cycle_timing_info, set_cycle_start_time,
-            get_all_standups, get_standup_status, get_standup_summary_data,
+            get_all_standups, get_standup_status, get_standup_summary_data, submit_test_standup,
             generate_project_tickets, analyze_developer_workload, 
             optimize_ticket_assignment, create_sprint_plan
         ]
@@ -85,8 +85,16 @@ class ScrumGraphBuilder:
         Project Description:
         {project_description}
         """
-        summary_response = self.llm.invoke(summary_prompt)
-        summary = summary_response.content.strip()
+        
+        try:
+            print("🔍 [Workflow] Attempting to call Groq API for project summary...")
+            summary_response = self.llm.invoke(summary_prompt)
+            summary = summary_response.content.strip()
+            print("✅ [Workflow] Groq API call successful")
+        except Exception as e:
+            print(f"❌ [Workflow] Error calling Groq API: {e}")
+            print(f"🔍 [Workflow] Error type: {type(e).__name__}")
+            raise
         write_project_summary.invoke({"project_id": project_id, "summary": summary})
         
         # Initialize project configuration
@@ -106,8 +114,13 @@ class ScrumGraphBuilder:
         start_time = time.time()
         project_id = state["project_id"]
         
-        # Get developer profiles
-        dev_profiles = get_dev_profiles.invoke({"project_id": project_id})
+        # Use developer profiles from state (passed from FastAPI)
+        dev_profiles = state.get("dev_profiles", [])
+        
+        # If no dev profiles in state, try to get them from Firebase
+        if not dev_profiles:
+            self._log("No dev profiles in state, fetching from Firebase...")
+            dev_profiles = get_dev_profiles.invoke({"project_id": project_id})
         
         # Get project configuration
         project_config = get_project_config.invoke({"project_id": project_id})
@@ -126,7 +139,10 @@ class ScrumGraphBuilder:
         state["context_gathered"] = True
         state["next_node"] = "generate_tickets"
         
-        self._log("Gathering developer profiles, project config, scrum history, and existing tickets")
+        self._log(f"Gathered {len(dev_profiles)} developer profiles, project config, scrum history, and existing tickets")
+        for dev in dev_profiles:
+            self._log(f"  - {dev.get('name', 'Unknown')} ({dev.get('email', 'No email')}) - {dev.get('role', 'Developer')}")
+        
         elapsed = time.time() - start_time
         self._log(f"Exiting node: GatherContext (took {elapsed:.2f}s)")
         return state
@@ -209,8 +225,11 @@ class ScrumGraphBuilder:
                     "created_at": datetime.datetime.now(datetime.timezone.utc),
                     "updated_at": datetime.datetime.now(datetime.timezone.utc)
                 }
+                # Store in both locations for consistency
                 # Store in dev_profiles/{dev_id}/tickets
                 db.collection("projects").document(project_id).collection("dev_profiles").document(dev_id).collection("tickets").document(ticket_id).set(ticket_doc)
+                # Also store in main tickets collection
+                db.collection("projects").document(project_id).collection("tickets").document(ticket_id).set(ticket_doc)
                 created_tickets.append(ticket_doc)
                 ticket_assignments[dev_id].append(ticket_doc)
         state["generated_tickets"] = created_tickets
@@ -232,16 +251,38 @@ class ScrumGraphBuilder:
         if current_cycle == 0:
             set_cycle_start_time.invoke({"project_id": project_id, "cycle_number": current_cycle})
 
-        # DEMO MODE: Do not wait, immediately check standup status and proceed
-        standup_status = get_standup_status.invoke({"project_id": project_id, "cycle_number": current_cycle})
-        timing_info = get_cycle_timing_info.invoke({"project_id": project_id})
-
+        # Wait for standups for 5 minutes (300 seconds)
+        wait_duration = 300  # 5 minutes in seconds
+        check_interval = 10  # Check every 10 seconds
+        max_checks = wait_duration // check_interval
+        
+        self._log(f"Waiting for standups for {wait_duration} seconds (checking every {check_interval}s)")
+        
+        for check_count in range(max_checks):
+            # Check standup status
+            standup_status = get_standup_status.invoke({"project_id": project_id, "cycle_number": current_cycle})
+            timing_info = get_cycle_timing_info.invoke({"project_id": project_id})
+            
+            self._log(f"Check {check_count + 1}/{max_checks}: {standup_status['submitted_standups']}/{standup_status['total_developers']} standups submitted")
+            
+            # If all standups are submitted, proceed immediately
+            if standup_status["is_complete"]:
+                self._log("All standups submitted! Proceeding to summarization.")
+                break
+            
+            # If this is the last check, proceed anyway
+            if check_count == max_checks - 1:
+                self._log("Time limit reached. Proceeding with available standups.")
+                break
+            
+            # Wait before next check
+            time.sleep(check_interval)
+        
         state["standup_status"] = standup_status
         state["timing_info"] = timing_info
         state["standups_ready"] = True
         state["next_node"] = "summarize_standups"
-        self._log(f"Standup status: {standup_status}")
-        self._log(f"Timing info: {timing_info}")
+        
         elapsed = time.time() - start_time
         self._log(f"Exiting node: WaitForStandups (took {elapsed:.2f}s)")
         return state
