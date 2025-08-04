@@ -38,3 +38,26 @@ export const createWorkspace = async (workspaceName, userId) => {
   });
   return workspaceRef.id;
 };
+
+// Submit test standup
+export const submit_test_standup = async (standupData) => {
+  const { project_id, cycle_number, dev_id, yesterday_work, today_plan, blockers } = standupData;
+  
+  try {
+    const doc_id = `${dev_id}_cycle_${cycle_number}`;
+    await setDoc(doc(db, `projects/${project_id}/standups`, doc_id), {
+      cycle: cycle_number,
+      dev_id: dev_id,
+      yesterday_work: yesterday_work,
+      today_plan: today_plan,
+      blockers: blockers,
+      timestamp: new Date(),
+      status: "completed"
+    });
+    
+    return `Standup submitted for dev ${dev_id} in cycle ${cycle_number}`;
+  } catch (error) {
+    console.error("Error submitting standup:", error);
+    throw error;
+  }
+};

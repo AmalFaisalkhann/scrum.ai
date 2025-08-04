@@ -43,6 +43,28 @@ def get_standup_status(project_id: str, cycle_number: int):
     }
 
 @tool
+def submit_test_standup(project_id: str, cycle_number: int, dev_id: str, yesterday_work: str = "", today_plan: str = "", blockers: str = ""):
+    """Submit a test standup for a developer (for testing purposes)"""
+    db = get_firestore()
+    
+    # Create standup data
+    standup_data = {
+        "cycle": cycle_number,
+        "dev_id": dev_id,
+        "yesterday_work": yesterday_work or f"Worked on assigned tickets for cycle {cycle_number}",
+        "today_plan": today_plan or "Continue with current tasks",
+        "blockers": blockers or "No blockers",
+        "timestamp": datetime.datetime.now(datetime.timezone.utc),
+        "status": "completed"
+    }
+    
+    # Save to Firebase
+    doc_id = f"{dev_id}_cycle_{cycle_number}"
+    db.collection("projects").document(project_id).collection("standups").document(doc_id).set(standup_data)
+    
+    return f"Test standup submitted for dev {dev_id} in cycle {cycle_number}"
+
+@tool
 def create_standup_template(project_id: str, cycle_number: int, dev_id: str):
     """Create a standup template for a developer in a specific cycle"""
     db = get_firestore()
