@@ -12,16 +12,20 @@ import {
   Spin,
 } from "antd";
 import "./Style.css";
+
 const { Title, Text } = Typography;
 const { Option } = Select;
+
 const Signup = () => {
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("Developer");
   const navigate = useNavigate();
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const { email, password, name, role } = values;
-      await registerUser(email, password, name, role);
+      const { email, password, name, role, stack, expertise } = values;
+      await registerUser(email, password, name, role, stack, expertise);
       alert("Signup successful!");
       navigate("/login");
     } catch (error) {
@@ -30,9 +34,9 @@ const Signup = () => {
       setLoading(false);
     }
   };
+
   return (
     <Row className="auth-container">
-      {/* Left Panel */}
       <Col span={14} className="left-panel">
         <div className="left-content">
           <div className="brand-logo">
@@ -59,7 +63,7 @@ const Signup = () => {
           </div>
         </div>
       </Col>
-      {/* Right Panel - Signup Form */}
+
       <Col span={10} className="auth-form-container">
         <Title level={2} className="auth-title">Create an Account</Title>
         <Text className="auth-subtitle">Sign up for scrum.ai</Text>
@@ -71,6 +75,7 @@ const Signup = () => {
           >
             <Input placeholder="Enter your full name" />
           </Form.Item>
+
           <Form.Item
             label="Email"
             name="email"
@@ -81,6 +86,7 @@ const Signup = () => {
           >
             <Input placeholder="Enter your email" />
           </Form.Item>
+
           <Form.Item
             label="Password"
             name="password"
@@ -88,18 +94,47 @@ const Signup = () => {
           >
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
-          <Form.Item label="Role" name="role" initialValue="Developer">
-            <Select>
+
+          <Form.Item
+            label="Role"
+            name="role"
+            initialValue="Developer"
+            rules={[{ required: true, message: "Please select a role" }]}
+          >
+            <Select onChange={(value) => setSelectedRole(value)}>
               <Option value="Project Manager">Project Manager</Option>
               <Option value="Developer">Developer</Option>
-              <Option value="Product Owner">Product Owner</Option> {/* ✅ Added */}
+              <Option value="Product Owner">Product Owner</Option>
             </Select>
           </Form.Item>
+
+          {/* Conditionally render stack and expertise if role is Developer */}
+          {selectedRole === "Developer" && (
+            <>
+              <Form.Item
+                label="Tech Stack"
+                name="stack"
+                rules={[{ required: true, message: "Please enter your stack" }]}
+              >
+                <Input placeholder="e.g. React, Node.js, MongoDB" />
+              </Form.Item>
+
+              <Form.Item
+                label="Expertise"
+                name="expertise"
+                rules={[{ required: true, message: "Please enter your expertise" }]}
+              >
+                <Input placeholder="e.g. Frontend, Backend, Fullstack" />
+              </Form.Item>
+            </>
+          )}
+
           <Form.Item>
             <Button type="primary" htmlType="submit" className="auth-button" block disabled={loading}>
               {loading ? <Spin size="small" /> : "Sign Up"}
             </Button>
           </Form.Item>
+
           <Text className="signup-text">
             Already have an account?{" "}
             <a href="/login" className="signup-link">
@@ -111,4 +146,5 @@ const Signup = () => {
     </Row>
   );
 };
+
 export default Signup;
