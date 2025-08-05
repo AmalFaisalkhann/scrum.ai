@@ -116,17 +116,19 @@ body, html {
 /* Team Member Row */
 .team-list {
   margin-top: 20px;
+  margin-bottom:100px;
 }
 
 .team-member-token {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 12px;
   background: #f9fafc;
   padding: 10px 14px;
   border-radius: 10px;
   border: 1px solid #e4e7eb;
+    flex-direction: column; 
 }
 
 /* Chart Container */
