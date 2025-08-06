@@ -321,7 +321,7 @@ const Manager = () => {
               <h2>Project Management</h2>
               <button 
                 onClick={() => setShowCreateProject(true)}
-                style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                style={{ padding: '10px 20px', backgroundColor: '#045da5', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
               >
                 + Create New Project
               </button>
@@ -371,45 +371,6 @@ const Manager = () => {
             )}
           </div>
 
-          {selectedProject && !showProjectStatus && (
-            <div className="section">
-              <h2>Manage Team for: {selectedProject.name}</h2>
-              <div className="project-edit-form">
-                <input value={selectedProject.name} onChange={(e) => setSelectedProject({ ...selectedProject, name: e.target.value })} />
-                <input value={selectedProject.id} onChange={(e) => setSelectedProject({ ...selectedProject, id: e.target.value })} />
-                <input value={selectedProject.timeline} onChange={(e) => setSelectedProject({ ...selectedProject, timeline: e.target.value })} />
-                <button onClick={handleProjectUpdate}>Update Project</button>
-              </div>
-
-              <div className="team-form">
-                <select value={teamData.user} onChange={(e) => setTeamData({ ...teamData, user: e.target.value })}>
-                  <option value="">Select Developer</option>
-                  {developerUsers.map((user, i) => (
-                    <option key={i} value={user}>{user}</option>
-                  ))}
-                </select>
-                <button onClick={handleAddToTeam}>Add to Team</button>
-              </div>
-
-              <div className="team-list">
-                {!selectedProject.team || selectedProject.team.length === 0 ? (
-                  <p>No members in this project yet.</p>
-                ) : (
-                  selectedProject.team.map((member, i) => (
-                    <div key={i} className="team-member-token">
-                      <span>{member.user}</span>
-                      <input
-                        placeholder="Assign Token"
-                        value={member.token || ''}
-                        onChange={(e) => handleTokenAssign(i, e.target.value)}
-                      />
-                      <button onClick={() => handleTaskDelete(i)} style={{ marginLeft: '8px' }}>Remove</button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
 
           <div className="section">
             <h2>Delivery Trends</h2>
@@ -419,7 +380,7 @@ const Manager = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#4a90e2" />
+                <Bar dataKey="value" fill="#4a8ce2ff" />
               </BarChart>
             </ResponsiveContainer>
           </div>
