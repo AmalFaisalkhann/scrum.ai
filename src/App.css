@@ -3,7 +3,7 @@
 body, html {
   margin: 0;
   
-  padding: 0;
+  padding: 0 px;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f4f6f8;
   color: #333;
@@ -56,6 +56,7 @@ body, html {
   max-width: 1000px;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  
 }
 
 .section h2 {
@@ -144,6 +145,7 @@ body, html {
 .section p {
   font-size: 15px;
   margin: 6px 0;
+  
 }
 
 /* Footer */
@@ -156,6 +158,7 @@ body, html {
   display: flex;
   justify-content: center;
   z-index: 100;
+
 }
 
 .bottom-nav ul {
@@ -170,4 +173,5 @@ body, html {
 
 .bottom-nav ul li {
   cursor: pointer;
-}
+} 
+  

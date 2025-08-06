@@ -7,6 +7,7 @@ import { db } from '../firebase';
 import StandupSubmission from './StandupSubmission';
 import '../App.css';
 import './Developer.css';
+import Column from 'antd/es/table/Column';
 
 function Developer() {
   const [assignedTickets, setAssignedTickets] = useState([]);
@@ -176,10 +177,9 @@ function Developer() {
         <nav>
           <ul>
             <li>Dashboard</li>
-            <li>Sprint Standups</li>
+            <li>Standups</li>
             <li>My Projects</li>
-            <li>Team Updates</li>
-            <li>Notifications</li>
+            <li>Assigned tickets</li>
           </ul>
         </nav>
         <div className="user-info">

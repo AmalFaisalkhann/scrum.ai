@@ -269,8 +269,8 @@ const Manager = () => {
         <nav>
           <ul>
             <li>Dashboard</li>
-            <li>Feedback</li>
-            <li>Notifications</li>
+            <li>team insights</li>
+            <li>delivery trends</li>
           </ul>
         </nav>
         <div className="user-info">
@@ -380,7 +380,7 @@ const Manager = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#4a8ce2ff" />
+                <Bar dataKey="value" fill="#4aa8e2ff" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -396,10 +396,7 @@ const Manager = () => {
             )}
           </div>
 
-          <div className="section">
-            <h2>Performance Analysis</h2>
-            <p>Most tasks completed by: Sara (12)</p>
-          </div>
+         
         </>
       )}
 
